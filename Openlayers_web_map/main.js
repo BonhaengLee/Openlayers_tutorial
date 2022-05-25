@@ -4,7 +4,9 @@ function init() {
   const map = new ol.Map({
     view: new ol.View({
       center: [0, 0],
-      zoom: 2,
+      zoom: 3,
+      minZoom: 2,
+      maxZoom: 6,
     }),
     layers: [
       new ol.layer.Tile({
@@ -12,5 +14,16 @@ function init() {
       }),
     ],
     target: "js-map",
+  });
+
+  const popupContainerElement = document.getElementById("popup-coordinates");
+  const popup = new ol.Overlay({
+    element: popupContainerElement,
+  });
+
+  map.addOverlay(popup);
+
+  map.on("click", (e) => {
+    console.log(e);
   });
 }
