@@ -1,12 +1,27 @@
 window.onload = init;
 
 function init() {
+  const fullScreenControl = new ol.control.FullScreen();
+  const mousePositionControl = new ol.control.MousePosition();
+  const overviewMapControl = new ol.control.OverviewMap({
+    collapsed: false,
+    layers: [
+      new ol.layer.Tile({
+        source: new ol.source.OSM(),
+      }),
+    ],
+  });
+  const scaleLineControl = new ol.control.ScaleLine();
+  const zoomSliderControl = new ol.control.ZoomSlider();
+  const zoomToExtentControl = new ol.control.ZoomToExtent();
+
   const map = new ol.Map({
     view: new ol.View({
       center: [0, 0],
       zoom: 3,
       minZoom: 2,
       maxZoom: 6,
+      rotation: 0,
     }),
     layers: [
       new ol.layer.Tile({
@@ -15,6 +30,16 @@ function init() {
     ],
     target: "js-map",
     keyboardEventTarget: document,
+    controls: ol.control
+      .defaults()
+      .extend([
+        fullScreenControl,
+        mousePositionControl,
+        overviewMapControl,
+        scaleLineControl,
+        zoomSliderControl,
+        zoomToExtentControl,
+      ]),
   });
 
   const popupContainerElement = document.getElementById("popup-coordinates");
