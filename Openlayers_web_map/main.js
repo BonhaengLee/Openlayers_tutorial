@@ -86,7 +86,7 @@ function init() {
   });
   map.addLayer(StamenBaseMapLayer);
 
-  // Tile ArcGIS REST API Layer
+  // Tile ArcGIS REST API Layer/
   const tileArcGISRESTAPILayer = new ol.layer.Tile({
     source: new ol.source.TileArcGISRest({
       url: "http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Population_World/MapServer",
@@ -94,6 +94,19 @@ function init() {
     visible: true,
   });
   map.addLayer(tileArcGISRESTAPILayer);
+
+  // NOAA WMS Layer
+  const NOAAWMSLayer = new ol.layer.Tile({
+    source: new ol.source.TileWMS({
+      url: "http:///nowcoast.noaa.gov/arcgis/services/nowcoast/analysis_meteohydro_sfc_qpe_time/MapServer/WMSServer?",
+      params: {
+        LAYERS: 1,
+        FORMAT: "image/png",
+        TRANSPARENT: true,
+      },
+    }),
+  });
+  map.addLayer(NOAAWMSLayer);
 
   map.on("click", (e) => {
     console.log(e.coordinate);
