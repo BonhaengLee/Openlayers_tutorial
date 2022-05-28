@@ -98,9 +98,9 @@ function init() {
   // NOAA WMS Layer
   const NOAAWMSLayer = new ol.layer.Tile({
     source: new ol.source.TileWMS({
-      url: "http:///nowcoast.noaa.gov/arcgis/services/nowcoast/analysis_meteohydro_sfc_qpe_time/MapServer/WMSServer?",
+      url: "https://nowcoast.noaa.gov/arcgis/services/nowcoast/forecast_meteoceanhydro_sfc_ndfd_dailymaxairtemp_offsets/MapServer/WMSServer?",
       params: {
-        LAYERS: 1,
+        LAYERS: 5,
         FORMAT: "image/png",
         TRANSPARENT: true,
       },
