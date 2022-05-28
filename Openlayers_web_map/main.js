@@ -82,9 +82,18 @@ function init() {
     source: new ol.source.XYZ({
       url: "http://tile.stamen.com/terrain/{z}/{x}/{y}.png",
     }),
-    visible: true,
+    visible: false,
   });
   map.addLayer(StamenBaseMapLayer);
+
+  // Tile ArcGIS REST API Layer
+  const tileArcGISRESTAPILayer = new ol.layer.Tile({
+    source: new ol.source.TileArcGISRest({
+      url: "http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Demographics/ESRI_Population_World/MapServer",
+    }),
+    visible: true,
+  });
+  map.addLayer(tileArcGISRESTAPILayer);
 
   map.on("click", (e) => {
     console.log(e.coordinate);
