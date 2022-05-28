@@ -5,16 +5,16 @@ function init() {
     view: new ol.View({
       center: [0, 0],
       zoom: 0,
-      extent: [
-        13957035.119643355, 3886409.4235566747, 14705484.243172048,
-        4686912.891080462,
-      ],
+      // extent: [
+      //   13957035.119643355, 3886409.4235566747, 14705484.243172048,
+      //   4686912.891080462,
+      // ],
     }),
     layers: [
       new ol.layer.Tile({
         source: new ol.source.OSM(),
         zIndex: 1,
-        visible: true,
+        visible: false,
         extent: [
           13957035.119643355, 3886409.4235566747, 14705484.243172048,
           4686912.891080462,
@@ -33,16 +33,34 @@ function init() {
           url: "https://{a-c}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
         }),
         zIndex: 0,
-        visible: true,
+        visible: false,
         extent: [
           13957035.119643355, 3886409.4235566747, 14705484.243172048,
           4686912.891080462,
         ],
         opacity: 0.5,
       }),
+      // Bing Maps Basemap Layer
+      new ol.layer.Tile({
+        source: new ol.source.BingMaps({
+          key: "AtYlGIWxIE6SZAHHFigm3lv2WfOVcoPtuErHVOYeZvmSzdUeEBPThaFVYafCQUJ0",
+          imagerySet: "CanvasGray",
+        }),
+        visible: false,
+      }),
     ],
   });
   map.addLayer(layerGroup);
+
+  // CartoDB Basemap Layer
+  const cartoDBBaseLayer = new ol.layer.Tile({
+    source: new ol.source.XYZ({
+      url: "https://{1-4}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}.png",
+    }),
+    visible: true,
+  });
+
+  map.addLayer(cartoDBBaseLayer);
 
   map.on("click", (e) => {
     console.log(e.coordinate);
