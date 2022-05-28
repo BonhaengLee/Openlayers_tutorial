@@ -57,10 +57,34 @@ function init() {
     source: new ol.source.XYZ({
       url: "https://{1-4}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}.png",
     }),
+    visible: false,
+  });
+  map.addLayer(cartoDBBaseLayer);
+
+  // TileDebug
+  const tileDebugLayer = new ol.layer.Tile({
+    source: new ol.source.TileDebug(),
+    visible: false,
+  });
+  map.addLayer(tileDebugLayer);
+
+  // Stamen Base Layer
+  const StamenBaseLayer = new ol.layer.Tile({
+    source: new ol.source.Stamen({
+      layer: "terrain-labels",
+    }),
+    visible: false,
+  });
+  map.addLayer(StamenBaseLayer);
+
+  // Stamen Basemap Layer
+  const StamenBaseMapLayer = new ol.layer.Tile({
+    source: new ol.source.XYZ({
+      url: "http://tile.stamen.com/terrain/{z}/{x}/{y}.png",
+    }),
     visible: true,
   });
-
-  map.addLayer(cartoDBBaseLayer);
+  map.addLayer(StamenBaseMapLayer);
 
   map.on("click", (e) => {
     console.log(e.coordinate);
