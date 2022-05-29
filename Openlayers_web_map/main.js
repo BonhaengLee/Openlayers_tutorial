@@ -1,4 +1,5 @@
 window.onload = init;
+// Attribution Control
 const attributionControl = new ol.control.Attribution({
   collapsible: true,
 });
@@ -9,64 +10,46 @@ function init() {
       center: [0, 0],
       zoom: 3,
     }),
-    layers: [
-      new ol.layer.Tile({
-        source: new ol.source.OSM(),
-        zIndex: 1,
-        visible: true,
-        opacity: 1,
-      }),
-    ],
+    layers: [],
     target: "js-map",
     controls: ol.control
       .defaults({ attribution: false })
       .extend([attributionControl]),
   });
 
-  // Layer Group
-  const layerGroup = new ol.layer.Group({
-    layers: [
-      new ol.layer.Tile({
-        source: new ol.source.OSM({
-          url: "https://{a-c}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
-        }),
-        zIndex: 0,
-        visible: true,
-        extent: [
-          13957035.119643355, 3886409.4235566747, 14705484.243172048,
-          4686912.891080462,
-        ],
-        opacity: 0.1,
-      }),
-      // Bing Maps Basemap Layer
-      new ol.layer.Tile({
-        source: new ol.source.BingMaps({
-          key: "AtYlGIWxIE6SZAHHFigm3lv2WfOVcoPtuErHVOYeZvmSzdUeEBPThaFVYafCQUJ0",
-          imagerySet: "CanvasGray",
-        }),
-        visible: true,
-      }),
-    ],
+  // Baes Layers
+  // Open Street Map Standard
+  const openStreetMapStandard = new ol.layer.Tile({
+    source: new ol.source.OSM(),
+    visible: true,
+    title: "OSMStandard",
   });
-  map.addLayer(layerGroup);
-
+  // Open Street Map Humanitarian
+  const openStreetMapHumanitarian = new ol.layer.Tile({
+    source: new ol.source.OSM({
+      url: "https://{a-c}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
+    }),
+    visible: false,
+    title: "OSMHumanitarian",
+  });
+  // Bing Maps Basemap Layer
+  const bingMaps = new ol.layer.Tile({
+    source: new ol.source.BingMaps({
+      key: "AtYlGIWxIE6SZAHHFigm3lv2WfOVcoPtuErHVOYeZvmSzdUeEBPThaFVYafCQUJ0",
+      imagerySet: "CanvasGray",
+    }),
+    visible: false,
+    title: "BingMaps",
+  });
   // CartoDB Basemap Layer
   const cartoDBBaseLayer = new ol.layer.Tile({
     source: new ol.source.XYZ({
       url: "https://{1-4}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}.png",
       attributions: "© CARTO",
     }),
-    visible: true,
+    visible: false,
+    title: "CartoDarkAll",
   });
-  map.addLayer(cartoDBBaseLayer);
-
-  // TileDebug
-  const tileDebugLayer = new ol.layer.Tile({
-    source: new ol.source.TileDebug(),
-    visible: true,
-  });
-  map.addLayer(tileDebugLayer);
-
   // Stamen Base Layer
   const StamenBaseLayer = new ol.layer.Tile({
     source: new ol.source.Stamen({
@@ -74,10 +57,9 @@ function init() {
       attributions:
         'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
     }),
-    visible: true,
+    visible: false,
+    title: "StamenTerrainWithLabels",
   });
-  map.addLayer(StamenBaseLayer);
-
   // Stamen Basemap Layer
   const StamenBaseMapLayer = new ol.layer.Tile({
     source: new ol.source.XYZ({
@@ -85,9 +67,42 @@ function init() {
       attributions:
         'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
     }),
-    visible: true,
+    visible: false,
+    title: "StamenTerrain",
   });
-  map.addLayer(StamenBaseMapLayer);
+
+  // Base Layer Group
+  const baseLayerGroup = new ol.layer.Group({
+    layers: [
+      openStreetMapStandard,
+      openStreetMapHumanitarian,
+      bingMaps,
+      cartoDBBaseLayer,
+      StamenBaseLayer,
+      StamenBaseMapLayer,
+    ],
+  });
+  map.addLayer(baseLayerGroup);
+
+  // Layer Switcher Logic for BaseLayers
+  const baseLayerElements = document.querySelectorAll(
+    ".sidebar > input[type=radio]"
+  );
+  for (const baseLayerElement of baseLayerElements) {
+    baseLayerElement.addEventListener("change", function (event) {
+      const baseLayerElementValue = this.value;
+      baseLayerGroup.getLayers().forEach((el, idx, arr) => {
+        const baseLayerName = el.get("title");
+        el.setVisible(baseLayerName === baseLayerElementValue);
+      });
+    });
+  }
+
+  // TileDebug
+  const tileDebugLayer = new ol.layer.Tile({
+    source: new ol.source.TileDebug(),
+    visible: false,
+  });
 
   // Tile ArcGIS REST API Layer/
   const tileArcGISRESTAPILayer = new ol.layer.Tile({
@@ -96,9 +111,8 @@ function init() {
       attributions:
         "Copyright© 2008, MSD, PVA, Louisville Water Company, Louisville Metro Government",
     }),
-    visible: true,
+    visible: false,
   });
-  map.addLayer(tileArcGISRESTAPILayer);
 
   // NOAA WMS Layer
   const NOAAWMSLayer = new ol.layer.Tile({
@@ -109,17 +123,9 @@ function init() {
         FORMAT: "image/png",
         TRANSPARENT: true,
       },
-      // attributions:
-      //   "<a href='https://nowcoast.noaa.gov' target='_blank'>© NOAA</a>",
+      attributions:
+        "<a href='https://nowcoast.noaa.gov' target='_blank'>© NOAA</a>",
     }),
-  });
-  map.addLayer(NOAAWMSLayer);
-  NOAAWMSLayer.getSource().setAttributions(
-    "<a href='https://nowcoast.noaa.gov' target='_blank'>© NOAA</a>"
-  );
-  NOAAWMSLayer.set("maxZoom", 5);
-
-  map.on("click", (e) => {
-    console.log(e.coordinate);
+    visible: false,
   });
 }
