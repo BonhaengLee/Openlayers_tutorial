@@ -101,7 +101,7 @@ function init() {
   // TileDebug
   const tileDebugLayer = new ol.layer.Tile({
     source: new ol.source.TileDebug(),
-    visible: false,
+    visible: true,
     title: "TIleDebugLayer",
   });
 
@@ -112,7 +112,7 @@ function init() {
       attributions:
         "Copyright© 2008, MSD, PVA, Louisville Water Company, Louisville Metro Government",
     }),
-    visible: false,
+    visible: true,
     title: "TileArcGISLayer",
   });
 
@@ -128,15 +128,33 @@ function init() {
       attributions:
         "<a href='https://nowcoast.noaa.gov' target='_blank'>© NOAA</a>",
     }),
-    visible: false,
+    visible: true,
     title: "NOAAWMSLayer",
+  });
+  // Static Image OpenStreetMap
+  const openStreetMapFragmentStatic = new ol.layer.Image({
+    source: new ol.source.ImageStatic({
+      url: "./data/static_images/openlayers_static_humanitarian.PNG",
+      imageExtent: [
+        4961253.529183386, 4924379.110244195, 10066374.440016285,
+        10034118.014079941,
+      ],
+      attributions:
+        '<a href="https://www.openstreetmap.org/copyright/">© OpenStreetMap contributors</a>',
+    }),
+    title: "openStreetMapFragmentStatic",
   });
 
   // Raster Tile Layer Group
-  const rasterTileLayerGroup = new ol.layer.Group({
-    layers: [tileDebugLayer, tileArcGISLayer, NOAAWMSLayer],
+  const rasterLayerGroup = new ol.layer.Group({
+    layers: [
+      tileDebugLayer,
+      tileArcGISLayer,
+      NOAAWMSLayer,
+      openStreetMapFragmentStatic,
+    ],
   });
-  map.addLayer(rasterTileLayerGroup);
+  map.addLayer(rasterLayerGroup);
 
   // Layer Switcher Logic for Raster Tile Layers
   const tileRasterLayerElements = document.querySelectorAll(
@@ -147,7 +165,7 @@ function init() {
       const tileRasterLayerElementValue = this.value;
       let tileRasterLayer;
 
-      rasterTileLayerGroup.getLayers().forEach((el, idx, arr) => {
+      rasterLayerGroup.getLayers().forEach((el, idx, arr) => {
         if (el.get("title") === tileRasterLayerElementValue) {
           tileRasterLayer = el;
         }
