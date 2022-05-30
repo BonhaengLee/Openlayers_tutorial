@@ -102,16 +102,18 @@ function init() {
   const tileDebugLayer = new ol.layer.Tile({
     source: new ol.source.TileDebug(),
     visible: false,
+    title: "TIleDebugLayer",
   });
 
   // Tile ArcGIS REST API Layer/
-  const tileArcGISRESTAPILayer = new ol.layer.Tile({
+  const tileArcGISLayer = new ol.layer.Tile({
     source: new ol.source.TileArcGISRest({
       url: "http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Louisville/LOJIC_LandRecords_Louisville/MapServer",
       attributions:
         "Copyright© 2008, MSD, PVA, Louisville Water Company, Louisville Metro Government",
     }),
     visible: false,
+    title: "TileArcGISLayer",
   });
 
   // NOAA WMS Layer
@@ -127,5 +129,30 @@ function init() {
         "<a href='https://nowcoast.noaa.gov' target='_blank'>© NOAA</a>",
     }),
     visible: false,
+    title: "NOAAWMSLayer",
   });
+
+  // Raster Tile Layer Group
+  const rasterTileLayerGroup = new ol.layer.Group({
+    layers: [tileDebugLayer, tileArcGISLayer, NOAAWMSLayer],
+  });
+  map.addLayer(rasterTileLayerGroup);
+
+  // Layer Switcher Logic for Raster Tile Layers
+  const tileRasterLayerElements = document.querySelectorAll(
+    ".sidebar > input[type=checkbox]"
+  );
+  for (const tileRasterLayerElement of tileRasterLayerElements) {
+    tileRasterLayerElement.addEventListener("change", function (event) {
+      const tileRasterLayerElementValue = this.value;
+      let tileRasterLayer;
+
+      rasterTileLayerGroup.getLayers().forEach((el, idx, arr) => {
+        if (el.get("title") === tileRasterLayerElementValue) {
+          tileRasterLayer = el;
+        }
+      });
+      tileRasterLayer.setVisible(this.checked);
+    });
+  }
 }
