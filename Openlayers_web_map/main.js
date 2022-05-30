@@ -1,57 +1,62 @@
 window.onload = init;
-// Attribution Control
-const attributionControl = new ol.control.Attribution({
-  collapsible: true,
-});
 
 function init() {
+  // Attribution Control
+  const attributionControl = new ol.control.Attribution({
+    collapsible: true,
+  });
+
+  // Map object
   const map = new ol.Map({
     view: new ol.View({
       center: [0, 0],
       zoom: 3,
     }),
-    layers: [],
     target: "js-map",
     controls: ol.control
       .defaults({ attribution: false })
       .extend([attributionControl]),
   });
 
-  // Baes Layers
-  // Open Street Map Standard
-  const openStreetMapStandard = new ol.layer.Tile({
+  // Base Layers
+  // Openstreet Map Standard
+  const openstreetMapStandard = new ol.layer.Tile({
     source: new ol.source.OSM(),
     visible: true,
     title: "OSMStandard",
   });
-  // Open Street Map Humanitarian
-  const openStreetMapHumanitarian = new ol.layer.Tile({
+
+  // Openstreet Map Humanitarian
+  const openstreetMapHumanitarian = new ol.layer.Tile({
     source: new ol.source.OSM({
       url: "https://{a-c}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png",
     }),
     visible: false,
     title: "OSMHumanitarian",
   });
+
   // Bing Maps Basemap Layer
   const bingMaps = new ol.layer.Tile({
     source: new ol.source.BingMaps({
-      key: "AtYlGIWxIE6SZAHHFigm3lv2WfOVcoPtuErHVOYeZvmSzdUeEBPThaFVYafCQUJ0",
-      imagerySet: "CanvasGray",
+      key: "Your Bingmaps API Key Here",
+      imagerySet: "CanvasGray", // Road, CanvasDark, CanvasGray
     }),
     visible: false,
     title: "BingMaps",
   });
-  // CartoDB Basemap Layer
+
+  // CartoDB BaseMap Layer
   const cartoDBBaseLayer = new ol.layer.Tile({
     source: new ol.source.XYZ({
-      url: "https://{1-4}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}.png",
+      url: "http://{1-4}.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}.png",
       attributions: "© CARTO",
     }),
     visible: false,
     title: "CartoDarkAll",
   });
-  // Stamen Base Layer
-  const StamenBaseLayer = new ol.layer.Tile({
+
+  // Stamen basemap layer
+  const StamenTerrainWithLabels = new ol.layer.Tile({
     source: new ol.source.Stamen({
       layer: "terrain-labels",
       attributions:
@@ -60,10 +65,10 @@ function init() {
     visible: false,
     title: "StamenTerrainWithLabels",
   });
-  // Stamen Basemap Layer
-  const StamenBaseMapLayer = new ol.layer.Tile({
+
+  const StamenTerrain = new ol.layer.Tile({
     source: new ol.source.XYZ({
-      url: "http://tile.stamen.com/terrain/{z}/{x}/{y}.png",
+      url: "http://tile.stamen.com/terrain/{z}/{x}/{y}.jpg",
       attributions:
         'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
     }),
@@ -71,15 +76,38 @@ function init() {
     title: "StamenTerrain",
   });
 
+  // Base Vector Layers
+  // Vector Tile Layer OpenstreetMap
+  const openstreetMapVectorTile = new ol.layer.VectorTile({
+    source: new ol.source.VectorTile({
+      url: "https://api.maptiler.com/tiles/v3/{z}/{x}/{y}.pbf?key=eNZMd85Lie6HD3TUfd5e",
+      format: new ol.format.MVT(),
+      attributions:
+        '<a href="https://www.maptiler.com/copyright/" target="_blank">© MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">© OpenStreetMap contributors</a>',
+    }),
+    visible: false,
+    title: "VectorTileLayerOpenstreetMap",
+  });
+
+  const openstreetMapVectorTileStyles =
+    "https://api.maptiler.com/maps/436160e2-0bbb-47fe-bbd2-33d6f0f8d185/style.json?key=LWnl5MKlGtDBjZf2EntB";
+  fetch(openstreetMapVectorTileStyles).then(function (response) {
+    response.json().then(function (glStyle) {
+      console.log(glStyle);
+      olms.applyStyle(openstreetMapVectorTile, glStyle, "v3-openmaptiles");
+    });
+  });
+
   // Base Layer Group
   const baseLayerGroup = new ol.layer.Group({
     layers: [
-      openStreetMapStandard,
-      openStreetMapHumanitarian,
+      openstreetMapStandard,
+      openstreetMapHumanitarian,
       bingMaps,
       cartoDBBaseLayer,
-      StamenBaseLayer,
-      StamenBaseMapLayer,
+      StamenTerrainWithLabels,
+      StamenTerrain,
+      openstreetMapVectorTile,
     ],
   });
   map.addLayer(baseLayerGroup);
@@ -88,12 +116,12 @@ function init() {
   const baseLayerElements = document.querySelectorAll(
     ".sidebar > input[type=radio]"
   );
-  for (const baseLayerElement of baseLayerElements) {
-    baseLayerElement.addEventListener("change", function (event) {
-      const baseLayerElementValue = this.value;
-      baseLayerGroup.getLayers().forEach((el, idx, arr) => {
-        const baseLayerName = el.get("title");
-        el.setVisible(baseLayerName === baseLayerElementValue);
+  for (let baseLayerElement of baseLayerElements) {
+    baseLayerElement.addEventListener("change", function () {
+      let baseLayerElementValue = this.value;
+      baseLayerGroup.getLayers().forEach(function (element, index, array) {
+        let baseLayerName = element.get("title");
+        element.setVisible(baseLayerName === baseLayerElementValue);
       });
     });
   }
@@ -102,10 +130,10 @@ function init() {
   const tileDebugLayer = new ol.layer.Tile({
     source: new ol.source.TileDebug(),
     visible: true,
-    title: "TIleDebugLayer",
+    title: "TileDebugLayer",
   });
 
-  // Tile ArcGIS REST API Layer/
+  // tile ArcGIS REST API Layer
   const tileArcGISLayer = new ol.layer.Tile({
     source: new ol.source.TileArcGISRest({
       url: "http://sampleserver1.arcgisonline.com/ArcGIS/rest/services/Louisville/LOJIC_LandRecords_Louisville/MapServer",
@@ -121,37 +149,37 @@ function init() {
     source: new ol.source.TileWMS({
       url: "https://nowcoast.noaa.gov/arcgis/services/nowcoast/forecast_meteoceanhydro_sfc_ndfd_dailymaxairtemp_offsets/MapServer/WMSServer?",
       params: {
-        LAYERS: 1,
+        LAYERS: 5,
         FORMAT: "image/png",
         TRANSPARENT: true,
       },
-      attributions:
-        "<a href='https://nowcoast.noaa.gov' target='_blank'>© NOAA</a>",
+      attributions: "<a href=https://nowcoast.noaa.gov/>© NOAA<a/>",
     }),
     visible: true,
     title: "NOAAWMSLayer",
   });
-  // Static Image OpenStreetMap
-  const openStreetMapFragmentStatic = new ol.layer.Image({
+
+  // Static Image OpenstreetMap
+  const openstreetMapFragmentStatic = new ol.layer.Image({
     source: new ol.source.ImageStatic({
       url: "./data/static_images/openlayers_static_humanitarian.PNG",
       imageExtent: [
-        4961253.529183386, 4924379.110244195, 10066374.440016285,
-        10034118.014079941,
+        4991698.9328313675, 5050292.393744084, 10008191.828130603,
+        10013417.911357462,
       ],
       attributions:
-        '<a href="https://www.openstreetmap.org/copyright/">© OpenStreetMap contributors</a>',
+        "<a href=https://www.openstreetmap.org/copyright/>© OpenStreetMap contributors<a/>",
     }),
-    title: "openStreetMapFragmentStatic",
+    title: "openstreetMapFragmentStatic",
   });
 
   // Raster Tile Layer Group
   const rasterLayerGroup = new ol.layer.Group({
     layers: [
-      tileDebugLayer,
       tileArcGISLayer,
       NOAAWMSLayer,
-      openStreetMapFragmentStatic,
+      tileDebugLayer,
+      openstreetMapFragmentStatic,
     ],
   });
   map.addLayer(rasterLayerGroup);
@@ -160,17 +188,19 @@ function init() {
   const tileRasterLayerElements = document.querySelectorAll(
     ".sidebar > input[type=checkbox]"
   );
-  for (const tileRasterLayerElement of tileRasterLayerElements) {
-    tileRasterLayerElement.addEventListener("change", function (event) {
-      const tileRasterLayerElementValue = this.value;
+  for (let tileRasterLayerElement of tileRasterLayerElements) {
+    tileRasterLayerElement.addEventListener("change", function () {
+      let tileRasterLayerElementValue = this.value;
       let tileRasterLayer;
 
-      rasterLayerGroup.getLayers().forEach((el, idx, arr) => {
-        if (el.get("title") === tileRasterLayerElementValue) {
-          tileRasterLayer = el;
+      rasterLayerGroup.getLayers().forEach(function (element, index, array) {
+        if (tileRasterLayerElementValue === element.get("title")) {
+          tileRasterLayer = element;
         }
       });
-      tileRasterLayer.setVisible(this.checked);
+      this.checked
+        ? tileRasterLayer.setVisible(true)
+        : tileRasterLayer.setVisible(false);
     });
   }
 }
