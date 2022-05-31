@@ -93,7 +93,6 @@ function init() {
     "https://api.maptiler.com/maps/436160e2-0bbb-47fe-bbd2-33d6f0f8d185/style.json?key=LWnl5MKlGtDBjZf2EntB";
   fetch(openstreetMapVectorTileStyles).then(function (response) {
     response.json().then(function (glStyle) {
-      console.log(glStyle);
       olms.applyStyle(openstreetMapVectorTile, glStyle, "v3-openmaptiles");
     });
   });
@@ -173,16 +172,38 @@ function init() {
     title: "openstreetMapFragmentStatic",
   });
 
+  // Vector Layers
+  // Central EU Countries GeoJSON VectorImage Layer
+  const EUCountriesGeoJSONVectorImage = new ol.layer.VectorImage({
+    source: new ol.source.Vector({
+      url: "./data/vector_data/Central_EU_countries_GeoJSON.geojson",
+      format: new ol.format.GeoJSON(),
+    }),
+    visible: false,
+    title: "CentralEUCountriesGeoJSON",
+  });
+
+  const EUCountriesKML = new ol.layer.Vector({
+    source: new ol.source.Vector({
+      url: "./data/vector_data/Central_EU_countries_KML.kml",
+      format: new ol.format.KML(),
+    }),
+    visible: false,
+    title: "CentralEUCountriesKML",
+  });
+
   // Raster Tile Layer Group
-  const rasterLayerGroup = new ol.layer.Group({
+  const layerGroup = new ol.layer.Group({
     layers: [
       tileArcGISLayer,
       NOAAWMSLayer,
       tileDebugLayer,
       openstreetMapFragmentStatic,
+      EUCountriesGeoJSONVectorImage,
+      EUCountriesKML,
     ],
   });
-  map.addLayer(rasterLayerGroup);
+  map.addLayer(layerGroup);
 
   // Layer Switcher Logic for Raster Tile Layers
   const tileRasterLayerElements = document.querySelectorAll(
@@ -193,14 +214,12 @@ function init() {
       let tileRasterLayerElementValue = this.value;
       let tileRasterLayer;
 
-      rasterLayerGroup.getLayers().forEach(function (element, index, array) {
+      layerGroup.getLayers().forEach(function (element, index, array) {
         if (tileRasterLayerElementValue === element.get("title")) {
           tileRasterLayer = element;
         }
       });
-      this.checked
-        ? tileRasterLayer.setVisible(true)
-        : tileRasterLayer.setVisible(false);
+      tileRasterLayer.setVisible(this.checked);
     });
   }
 }
