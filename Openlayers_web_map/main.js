@@ -249,17 +249,23 @@ function init() {
   );
 
   // Vector Feature Popup Logic
-  map.on("click", function (e) {
-    overlayLayer.setPosition(undefined);
-    map.forEachFeatureAtPixel(e.pixel, function (feature, layer) {
-      const clickedCoordinate = e.coordinate;
-      const clickedFeatureName = feature.get("name");
-      const clickedFeatureAdditionalInfo = feature.get("additionalinfo");
-      if (clickedFeatureName && clickedFeatureAdditionalInfo !== undefined) {
+  map.on(
+    "click",
+    function (e) {
+      overlayLayer.setPosition(undefined);
+      map.forEachFeatureAtPixel(e.pixel, function (feature, layer) {
+        const clickedCoordinate = e.coordinate;
+        const clickedFeatureName = feature.get("name");
+        const clickedFeatureAdditionalInfo = feature.get("additionalinfo");
         overlayLayer.setPosition(clickedCoordinate);
         overlayFeatureName.innerHTML = clickedFeatureName;
         overlayFeatureAdditionalInfo.innerHTML = clickedFeatureAdditionalInfo;
-      }
-    });
-  });
+      });
+    },
+    {
+      layerFilter: function (layerCandidate) {
+        return layerCandidate.get("title") === "CentralEUCountriesGeoJSON";
+      },
+    }
+  );
 }
