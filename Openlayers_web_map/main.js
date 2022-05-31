@@ -192,6 +192,19 @@ function init() {
     title: "CentralEUCountriesKML",
   });
 
+  // HeatMap
+  const heatMapOnlineFBUsers = new ol.layer.Heatmap({
+    source: new ol.source.Vector({
+      url: "./data/vector_data/onlineFBUsers.geojson",
+      format: new ol.format.GeoJSON(),
+    }),
+    radius: 15,
+    blur: 10,
+    gradient: ["#00f", "#0ff", "#0f0", "#ff0", "black"],
+    visible: false,
+    title: "OnlineFBUsers",
+  });
+
   // Raster Tile Layer Group
   const layerGroup = new ol.layer.Group({
     layers: [
@@ -201,6 +214,7 @@ function init() {
       openstreetMapFragmentStatic,
       EUCountriesGeoJSONVectorImage,
       EUCountriesKML,
+      heatMapOnlineFBUsers,
     ],
   });
   map.addLayer(layerGroup);
