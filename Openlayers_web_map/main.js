@@ -236,4 +236,30 @@ function init() {
       tileRasterLayer.setVisible(this.checked);
     });
   }
+
+  // Vector Feature Popup Information
+  const overlayContainerElement = document.querySelector(".overlay-container");
+  const overlayLayer = new ol.Overlay({
+    element: overlayContainerElement,
+  });
+  map.addOverlay(overlayLayer);
+  const overlayFeatureName = document.getElementById("feature-name");
+  const overlayFeatureAdditionalInfo = document.getElementById(
+    "feature-additional-info"
+  );
+
+  // Vector Feature Popup Logic
+  map.on("click", function (e) {
+    overlayLayer.setPosition(undefined);
+    map.forEachFeatureAtPixel(e.pixel, function (feature, layer) {
+      const clickedCoordinate = e.coordinate;
+      const clickedFeatureName = feature.get("name");
+      const clickedFeatureAdditionalInfo = feature.get("additionalinfo");
+      if (clickedFeatureName && clickedFeatureAdditionalInfo !== undefined) {
+        overlayLayer.setPosition(clickedCoordinate);
+        overlayFeatureName.innerHTML = clickedFeatureName;
+        overlayFeatureAdditionalInfo.innerHTML = clickedFeatureAdditionalInfo;
+      }
+    });
+  });
 }
