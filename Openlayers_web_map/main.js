@@ -173,14 +173,31 @@ function init() {
   });
 
   // Vector Layers
+  // Styling of vector features
+  const fillStyle = new ol.style.Fill({
+    color: [40, 119, 247, 1],
+  });
+  // Style for lines
+  const strokeStyle = new ol.style.Stroke({
+    color: [30, 30, 31, 1],
+    width: 1.2,
+    lineCap: "square",
+    lineJoin: "bevel",
+    lineDash: [3, 30],
+  });
+
   // Central EU Countries GeoJSON VectorImage Layer
   const EUCountriesGeoJSONVectorImage = new ol.layer.VectorImage({
     source: new ol.source.Vector({
       url: "./data/vector_data/Central_EU_countries_GeoJSON.geojson",
       format: new ol.format.GeoJSON(),
     }),
-    visible: false,
+    visible: true,
     title: "CentralEUCountriesGeoJSON",
+    style: new ol.style.Style({
+      fill: fillStyle,
+      stroke: strokeStyle,
+    }),
   });
 
   const EUCountriesKML = new ol.layer.Vector({
